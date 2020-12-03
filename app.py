@@ -1,14 +1,20 @@
-from PIL import Image
+from PIL import Image, ImageTk
 import tkinter as tk
+from tkinter import filedialog
 import os
+import sys
 
 
 class MainApp(tk.Frame):
 
+    canvasX = 500
+    canvasY = 500
+
+
     def __init__(self, master=None):
         super().__init__(master)
         self.create_Toolbar()
-        self.create_Canvas()
+        self.create_Canvas(self.canvasX,self.canvasY)
 
     def create_Toolbar(self):
         self.master.title("Toolbar")
@@ -39,21 +45,35 @@ class MainApp(tk.Frame):
         self.pack()
 
 
-    def create_Canvas(self):
-        self.canvas = tk.Canvas(root, height=700, width=700, bg="#deadbf")
+    def create_Canvas(self, x, y):
+        self.canvas = tk.Canvas(root, height=x, width=y, bg="#deadbf")
         self.canvas.pack()
 
     def onSave(self):
         self.quit()
 
     def onLoad(self):
-        self.quit()
+        file_path = filedialog.askopenfilename()
+        try:
+            self.pilImg = Image.open(file_path)
+
+        except IOError:
+            print("Unable to load image")
+            sys.exit(1)
+
+        self.canvasX, self.canvasY = self.pilImg.size 
+        self.canvas.config(width=self.canvasX, height=self.canvasY)
+
+        self.tkImage = ImageTk.PhotoImage(self.pilImg)
+        self.imagesprite = self.canvas.create_image(self.canvasX/2,self.canvasY/2,image = self.tkImage)
+
+
 
     def onExit(self):
         self.quit()
 
     
 root = tk.Tk()
-root.geometry("1600x900+300+300")
+root.geometry()
 app = MainApp()
 root.mainloop()
