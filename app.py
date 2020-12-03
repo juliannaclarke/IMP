@@ -7,12 +7,10 @@ import sys
 
 class MainApp(tk.Frame):
 
-    canvasX = 500
-    canvasY = 500
-
-
     def __init__(self, master=None):
         super().__init__(master)
+        self.canvasX = 500
+        self.canvasY = 500
         self.create_Toolbar()
         self.create_Canvas(self.canvasX,self.canvasY)
 
