@@ -86,8 +86,13 @@ class MainApp(tk.Frame):
     def onSharpBlur(self):
         popup = tk.Tk()
         popup.wm_title("")
+
         label = ttk.Label(popup, text = "Sharpen/Blur")
         label.pack(side="top", fill="x", pady = 10)
+
+        slider = tk.Scale(popup, from_=-10, to = 10, orient=tk.HORIZONTAL)
+        slider.pack()
+
         previewButton = ttk.Button(popup, text = "Preview", command = popup.destroy)
         acceptButton = ttk.Button(popup, text = "Accept", command = popup.destroy)
         cancelButton = ttk.Button(popup, text = "Cancel", command = popup.destroy)
