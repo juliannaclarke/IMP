@@ -33,11 +33,11 @@ class MainApp(tk.Frame):
         btn_BrigtContr = tk.Button(toolbar, text = "Brightness/Contrast", command = self.onBrigtCont)
         btn_VisualEffect = tk.Button(toolbar, text = "VFX", command = self.onVFX)
 
-        btn_FindEdges.pack(side=tk.LEFT, padx=2, pady=2)
-        btn_SharpenBlur.pack(side=tk.LEFT, padx=2, pady=2)
-        btn_ColourEdit.pack(side=tk.LEFT, padx=2, pady=2)
-        btn_BrigtContr.pack(side=tk.LEFT, padx=2, pady=2)
-        btn_VisualEffect.pack(side=tk.LEFT, padx=2, pady=2)
+        btn_FindEdges.pack(side=tk.LEFT, expand=tk.YES, padx=2, pady=2)
+        btn_SharpenBlur.pack(side=tk.LEFT, expand=tk.YES, padx=2, pady=2)
+        btn_ColourEdit.pack(side=tk.LEFT, expand=tk.YES, padx=2, pady=2)
+        btn_BrigtContr.pack(side=tk.LEFT, expand=tk.YES, padx=2, pady=2)
+        btn_VisualEffect.pack(side=tk.LEFT, expand=tk.YES, padx=2, pady=2)
 
         toolbar.pack(side=tk.TOP, fill=tk.X)
         self.master.config(menu=menuBar)
@@ -70,11 +70,10 @@ class MainApp(tk.Frame):
         
 
     def onEdges(self):
-
-        popup = tk.Tk()
+        popup = tk.Toplevel(root)
         popup.wm_title("")
         label = ttk.Label(popup, text = "Find Edges")
-        label.pack(side="top", fill="x", pady = 10)
+        label.pack(side="top", pady = 10)
         previewButton = ttk.Button(popup, text = "Preview", command = popup.destroy)
         acceptButton = ttk.Button(popup, text = "Accept", command = popup.destroy)
         cancelButton = ttk.Button(popup, text = "Cancel", command = popup.destroy)
@@ -84,10 +83,14 @@ class MainApp(tk.Frame):
         popup.mainloop()
 
     def onSharpBlur(self):
-        popup = tk.Tk()
+        popup = tk.Toplevel(root)
         popup.wm_title("")
+
         label = ttk.Label(popup, text = "Sharpen/Blur")
-        label.pack(side="top", fill="x", pady = 10)
+        label.pack(side="top", pady = 10)
+        slider = tk.Scale(popup, from_=-10, to = 10, orient=tk.HORIZONTAL)
+        slider.pack(pady=20)
+
         previewButton = ttk.Button(popup, text = "Preview", command = popup.destroy)
         acceptButton = ttk.Button(popup, text = "Accept", command = popup.destroy)
         cancelButton = ttk.Button(popup, text = "Cancel", command = popup.destroy)
@@ -97,10 +100,14 @@ class MainApp(tk.Frame):
         popup.mainloop()
 
     def onColManip(self):
-        popup = tk.Tk()
+        popup = tk.Toplevel(root)
         popup.wm_title("")
-        label = ttk.Label(popup, text = "Colour Manipulation")
-        label.pack(side="top", fill="x", pady = 10)
+
+        label = ttk.Label(popup, text = "Hue")
+        label.pack(side="top", pady = 10)
+        slider = tk.Scale(popup, from_=-100, to = 100, orient=tk.HORIZONTAL)
+        slider.pack(pady=20)
+
         previewButton = ttk.Button(popup, text = "Preview", command = popup.destroy)
         acceptButton = ttk.Button(popup, text = "Accept", command = popup.destroy)
         cancelButton = ttk.Button(popup, text = "Cancel", command = popup.destroy)
@@ -110,10 +117,19 @@ class MainApp(tk.Frame):
         popup.mainloop()
 
     def onBrigtCont(self):
-        popup = tk.Tk()
+        popup = tk.Toplevel(root)
         popup.wm_title("")
-        label = ttk.Label(popup, text = "Brightness/Contrast")
-        label.pack(side="top", fill="x", pady = 10)
+
+        brightLabel = ttk.Label(popup, text = "Brightness")
+        brightSlider = tk.Scale(popup, from_=0, to=100, orient=tk.HORIZONTAL)
+        brightLabel.pack(pady = 10)
+        brightSlider.pack(pady = 20)
+
+        contrLabel = ttk.Label(popup, text="Contrast")
+        contSlider = tk.Scale(popup, from_=0, to=100, orient=tk.HORIZONTAL)
+        contrLabel.pack(pady=10)
+        contSlider.pack(pady=20)
+
         previewButton = ttk.Button(popup, text = "Preview", command = popup.destroy)
         acceptButton = ttk.Button(popup, text = "Accept", command = popup.destroy)
         cancelButton = ttk.Button(popup, text = "Cancel", command = popup.destroy)
@@ -123,10 +139,10 @@ class MainApp(tk.Frame):
         popup.mainloop()
 
     def onVFX(self):
-        popup = tk.Tk()
+        popup = tk.Toplevel(root)
         popup.wm_title("")
         label = ttk.Label(popup, text = "Special Effect")
-        label.pack(side="top", fill="x", pady = 10)
+        label.pack(side="top", pady = 10)
         previewButton = ttk.Button(popup, text = "Preview", command = popup.destroy)
         acceptButton = ttk.Button(popup, text = "Accept", command = popup.destroy)
         cancelButton = ttk.Button(popup, text = "Cancel", command = popup.destroy)
