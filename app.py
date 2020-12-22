@@ -88,6 +88,7 @@ class MainApp(tk.Frame):
         #create and pack text
         label = ttk.Label(popup, text = "Find Edges")
         label.pack(side="top", pady = 10)
+        
         #create and pack buttons, which call commmands when completed
         previewButton = ttk.Button(popup, text = "Preview", command = popup.destroy)
         acceptButton = ttk.Button(popup, text = "Accept", command = popup.destroy)
@@ -130,6 +131,7 @@ class MainApp(tk.Frame):
         slider = tk.Scale(popup, from_=-100, to = 100, orient=tk.HORIZONTAL)
         slider.pack(pady=20)
 
+
         #create and pack buttons, which call commmands when completed
         previewButton = ttk.Button(popup, text = "Preview", command = popup.destroy)
         acceptButton = ttk.Button(popup, text = "Accept", command = popup.destroy)
@@ -141,6 +143,7 @@ class MainApp(tk.Frame):
         popup.mainloop()
 
     def onBrigtCont(self):
+
         #create toplevel popup
         popup = tk.Toplevel(root)
         popup.wm_title("")
@@ -156,6 +159,7 @@ class MainApp(tk.Frame):
         contSlider = tk.Scale(popup, from_=0, to=100, orient=tk.HORIZONTAL)
         contrLabel.pack(pady=10)
         contSlider.pack(pady=20)
+
 
         #create and pack buttons, which call commmands when completed
         previewButton = ttk.Button(popup, text = "Preview", command = popup.destroy)
@@ -174,6 +178,7 @@ class MainApp(tk.Frame):
         #create and pack text
         label = ttk.Label(popup, text = "Special Effect")
         label.pack(side="top", pady = 10)
+
         
         #create and pack buttons, which call commmands when completed
         previewButton = ttk.Button(popup, text = "Preview", command = popup.destroy)
@@ -203,13 +208,26 @@ class Find_Edges(Tool):
 class Sharpness_Blur(Tool):
     def action(self, currentImage):
         blurRad = Scale(master, from_=0, to=5, orient=HORIZONTAL)
-        burRad.pack()
+
+        blurRad.pack()
         self.currentImage = currentImage.filter(ImageFilter.GaussianBlur(radius = blurRad.get()))
 
         sharpFactor = Scale(master, from_=0, to=5, orient=HORIZONTAL)
         sharpFactor.pack()
         sharpener = ImageEnhance.Sharpness(self.currentImage)
         self.currentImage = sharpener.enhance(sharpFactor.get())
+        return
+
+class Colour_Manipulation(Tool):
+    def action(self, currentImage):
+        return
+
+class Contrast_Brightness(Tool):
+    def action(self, currentImage):
+        return
+
+class Neon_Effect(Tool):
+    def action(self, currentImage):
         return
 
     
