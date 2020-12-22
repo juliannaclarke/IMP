@@ -1,5 +1,6 @@
 from PIL import Image, ImageTk
 import tkinter as tk
+from tkinter import ttk
 from tkinter import filedialog
 import os
 import sys
@@ -26,11 +27,11 @@ class MainApp(tk.Frame):
 
         toolbar = tk.Frame(self.master, bd = 1, relief = tk.RAISED)
 
-        btn_FindEdges = tk.Button(toolbar, text = "Find Edges")
-        btn_SharpenBlur = tk.Button(toolbar, text = "Sharpen/Blur")
-        btn_ColourEdit = tk.Button(toolbar, text = "Colour Manupulation")
-        btn_BrigtContr = tk.Button(toolbar, text = "Brightness/Contrast")
-        btn_VisualEffect = tk.Button(toolbar, text = "VFX")
+        btn_FindEdges = tk.Button(toolbar, text = "Find Edges", command = self.onEdges)
+        btn_SharpenBlur = tk.Button(toolbar, text = "Sharpen/Blur", command = self.onSharpBlur)
+        btn_ColourEdit = tk.Button(toolbar, text = "Colour Manupulation" , command = self.onColManip)
+        btn_BrigtContr = tk.Button(toolbar, text = "Brightness/Contrast", command = self.onBrigtCont)
+        btn_VisualEffect = tk.Button(toolbar, text = "VFX", command = self.onVFX)
 
         btn_FindEdges.pack(side=tk.LEFT, padx=2, pady=2)
         btn_SharpenBlur.pack(side=tk.LEFT, padx=2, pady=2)
@@ -50,6 +51,8 @@ class MainApp(tk.Frame):
     def onSave(self):
         self.quit()
 
+
+
     def onLoad(self):
         file_path = filedialog.askopenfilename()
         try:
@@ -64,7 +67,73 @@ class MainApp(tk.Frame):
 
         self.tkImage = ImageTk.PhotoImage(self.pilImg)
         self.imagesprite = self.canvas.create_image(self.canvasX/2,self.canvasY/2,image = self.tkImage)
+        
 
+    def onEdges(self):
+
+        popup = tk.Tk()
+        popup.wm_title("")
+        label = ttk.Label(popup, text = "Find Edges")
+        label.pack(side="top", fill="x", pady = 10)
+        previewButton = ttk.Button(popup, text = "Preview", command = popup.destroy)
+        acceptButton = ttk.Button(popup, text = "Accept", command = popup.destroy)
+        cancelButton = ttk.Button(popup, text = "Cancel", command = popup.destroy)
+        previewButton.pack(pady = 15)
+        acceptButton.pack(side=tk.LEFT, padx=2, pady=2)
+        cancelButton.pack(side=tk.LEFT, padx=2, pady=2)
+        popup.mainloop()
+
+    def onSharpBlur(self):
+        popup = tk.Tk()
+        popup.wm_title("")
+        label = ttk.Label(popup, text = "Sharpen/Blur")
+        label.pack(side="top", fill="x", pady = 10)
+        previewButton = ttk.Button(popup, text = "Preview", command = popup.destroy)
+        acceptButton = ttk.Button(popup, text = "Accept", command = popup.destroy)
+        cancelButton = ttk.Button(popup, text = "Cancel", command = popup.destroy)
+        previewButton.pack(pady = 15)
+        acceptButton.pack(side=tk.LEFT, padx=2, pady=2)
+        cancelButton.pack(side=tk.LEFT, padx=2, pady=2)
+        popup.mainloop()
+
+    def onColManip(self):
+        popup = tk.Tk()
+        popup.wm_title("")
+        label = ttk.Label(popup, text = "Colour Manipulation")
+        label.pack(side="top", fill="x", pady = 10)
+        previewButton = ttk.Button(popup, text = "Preview", command = popup.destroy)
+        acceptButton = ttk.Button(popup, text = "Accept", command = popup.destroy)
+        cancelButton = ttk.Button(popup, text = "Cancel", command = popup.destroy)
+        previewButton.pack(pady = 15)
+        acceptButton.pack(side=tk.LEFT, padx=2, pady=2)
+        cancelButton.pack(side=tk.LEFT, padx=2, pady=2)
+        popup.mainloop()
+
+    def onBrigtCont(self):
+        popup = tk.Tk()
+        popup.wm_title("")
+        label = ttk.Label(popup, text = "Brightness/Contrast")
+        label.pack(side="top", fill="x", pady = 10)
+        previewButton = ttk.Button(popup, text = "Preview", command = popup.destroy)
+        acceptButton = ttk.Button(popup, text = "Accept", command = popup.destroy)
+        cancelButton = ttk.Button(popup, text = "Cancel", command = popup.destroy)
+        previewButton.pack(pady = 15)
+        acceptButton.pack(side=tk.LEFT, padx=2, pady=2)
+        cancelButton.pack(side=tk.LEFT, padx=2, pady=2)
+        popup.mainloop()
+
+    def onVFX(self):
+        popup = tk.Tk()
+        popup.wm_title("")
+        label = ttk.Label(popup, text = "Special Effect")
+        label.pack(side="top", fill="x", pady = 10)
+        previewButton = ttk.Button(popup, text = "Preview", command = popup.destroy)
+        acceptButton = ttk.Button(popup, text = "Accept", command = popup.destroy)
+        cancelButton = ttk.Button(popup, text = "Cancel", command = popup.destroy)
+        previewButton.pack(pady = 15)
+        acceptButton.pack(side=tk.LEFT, padx=2, pady=2)
+        cancelButton.pack(side=tk.LEFT, padx=2, pady=2)
+        popup.mainloop()
 
 
     def onExit(self):
