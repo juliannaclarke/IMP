@@ -1,14 +1,19 @@
-from PIL import Image, ImageFilter, ImageEnhance
+from PIL import Image, ImageTk, ImageFilter, ImageEnhance
 import tkinter as tk
+from tkinter import ttk
+from tkinter import filedialog
 import os
+import sys
 
 
 class MainApp(tk.Frame):
 
     def __init__(self, master=None):
         super().__init__(master)
+        self.canvasX = 500
+        self.canvasY = 500
         self.create_Toolbar()
-        self.create_Canvas()
+        self.create_Canvas(self.canvasX,self.canvasY)
 
     def create_Toolbar(self):
         self.master.title("Toolbar")
@@ -22,11 +27,11 @@ class MainApp(tk.Frame):
 
         toolbar = tk.Frame(self.master, bd = 1, relief = tk.RAISED)
 
-        btn_FindEdges = tk.Button(toolbar, text = "Find Edges")
-        btn_SharpenBlur = tk.Button(toolbar, text = "Sharpen/Blur")
-        btn_ColourEdit = tk.Button(toolbar, text = "Colour Manupulation")
-        btn_BrigtContr = tk.Button(toolbar, text = "Brightness/Contrast")
-        btn_VisualEffect = tk.Button(toolbar, text = "VFX")
+        btn_FindEdges = tk.Button(toolbar, text = "Find Edges", command = self.onEdges)
+        btn_SharpenBlur = tk.Button(toolbar, text = "Sharpen/Blur", command = self.onSharpBlur)
+        btn_ColourEdit = tk.Button(toolbar, text = "Colour Manupulation" , command = self.onColManip)
+        btn_BrigtContr = tk.Button(toolbar, text = "Brightness/Contrast", command = self.onBrigtCont)
+        btn_VisualEffect = tk.Button(toolbar, text = "VFX", command = self.onVFX)
 
         btn_FindEdges.pack(side=tk.LEFT, padx=2, pady=2)
         btn_SharpenBlur.pack(side=tk.LEFT, padx=2, pady=2)
@@ -39,15 +44,97 @@ class MainApp(tk.Frame):
         self.pack()
 
 
-    def create_Canvas(self):
-        self.canvas = tk.Canvas(root, height=700, width=700, bg="#deadbf")
+    def create_Canvas(self, x, y):
+        self.canvas = tk.Canvas(root, height=x, width=y, bg="#deadbf")
         self.canvas.pack()
 
     def onSave(self):
         self.quit()
 
+
+
     def onLoad(self):
-        self.quit()
+        file_path = filedialog.askopenfilename()
+        try:
+            self.pilImg = Image.open(file_path)
+
+        except IOError:
+            print("Unable to load image")
+            sys.exit(1)
+
+        self.canvasX, self.canvasY = self.pilImg.size 
+        self.canvas.config(width=self.canvasX, height=self.canvasY)
+
+        self.tkImage = ImageTk.PhotoImage(self.pilImg)
+        self.imagesprite = self.canvas.create_image(self.canvasX/2,self.canvasY/2,image = self.tkImage)
+        
+
+    def onEdges(self):
+
+        popup = tk.Tk()
+        popup.wm_title("")
+        label = ttk.Label(popup, text = "Find Edges")
+        label.pack(side="top", fill="x", pady = 10)
+        previewButton = ttk.Button(popup, text = "Preview", command = popup.destroy)
+        acceptButton = ttk.Button(popup, text = "Accept", command = popup.destroy)
+        cancelButton = ttk.Button(popup, text = "Cancel", command = popup.destroy)
+        previewButton.pack(pady = 15)
+        acceptButton.pack(side=tk.LEFT, padx=2, pady=2)
+        cancelButton.pack(side=tk.LEFT, padx=2, pady=2)
+        popup.mainloop()
+
+    def onSharpBlur(self):
+        popup = tk.Tk()
+        popup.wm_title("")
+        label = ttk.Label(popup, text = "Sharpen/Blur")
+        label.pack(side="top", fill="x", pady = 10)
+        previewButton = ttk.Button(popup, text = "Preview", command = popup.destroy)
+        acceptButton = ttk.Button(popup, text = "Accept", command = popup.destroy)
+        cancelButton = ttk.Button(popup, text = "Cancel", command = popup.destroy)
+        previewButton.pack(pady = 15)
+        acceptButton.pack(side=tk.LEFT, padx=2, pady=2)
+        cancelButton.pack(side=tk.LEFT, padx=2, pady=2)
+        popup.mainloop()
+
+    def onColManip(self):
+        popup = tk.Tk()
+        popup.wm_title("")
+        label = ttk.Label(popup, text = "Colour Manipulation")
+        label.pack(side="top", fill="x", pady = 10)
+        previewButton = ttk.Button(popup, text = "Preview", command = popup.destroy)
+        acceptButton = ttk.Button(popup, text = "Accept", command = popup.destroy)
+        cancelButton = ttk.Button(popup, text = "Cancel", command = popup.destroy)
+        previewButton.pack(pady = 15)
+        acceptButton.pack(side=tk.LEFT, padx=2, pady=2)
+        cancelButton.pack(side=tk.LEFT, padx=2, pady=2)
+        popup.mainloop()
+
+    def onBrigtCont(self):
+        popup = tk.Tk()
+        popup.wm_title("")
+        label = ttk.Label(popup, text = "Brightness/Contrast")
+        label.pack(side="top", fill="x", pady = 10)
+        previewButton = ttk.Button(popup, text = "Preview", command = popup.destroy)
+        acceptButton = ttk.Button(popup, text = "Accept", command = popup.destroy)
+        cancelButton = ttk.Button(popup, text = "Cancel", command = popup.destroy)
+        previewButton.pack(pady = 15)
+        acceptButton.pack(side=tk.LEFT, padx=2, pady=2)
+        cancelButton.pack(side=tk.LEFT, padx=2, pady=2)
+        popup.mainloop()
+
+    def onVFX(self):
+        popup = tk.Tk()
+        popup.wm_title("")
+        label = ttk.Label(popup, text = "Special Effect")
+        label.pack(side="top", fill="x", pady = 10)
+        previewButton = ttk.Button(popup, text = "Preview", command = popup.destroy)
+        acceptButton = ttk.Button(popup, text = "Accept", command = popup.destroy)
+        cancelButton = ttk.Button(popup, text = "Cancel", command = popup.destroy)
+        previewButton.pack(pady = 15)
+        acceptButton.pack(side=tk.LEFT, padx=2, pady=2)
+        cancelButton.pack(side=tk.LEFT, padx=2, pady=2)
+        popup.mainloop()
+
 
     def onExit(self):
         self.quit()
@@ -77,6 +164,6 @@ class Sharpness_Blur(Tool):
 
     
 root = tk.Tk()
-root.geometry("1600x900+300+300")
+root.geometry()
 app = MainApp()
 root.mainloop()
