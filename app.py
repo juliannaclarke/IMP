@@ -169,13 +169,25 @@ class Find_Edges(Tool):
 class Sharpness_Blur(Tool):
     def action(self, currentImage):
         blurRad = Scale(master, from_=0, to=5, orient=HORIZONTAL)
-        burRad.pack()
+        blurRad.pack()
         self.currentImage = currentImage.filter(ImageFilter.GaussianBlur(radius = blurRad.get()))
 
         sharpFactor = Scale(master, from_=0, to=5, orient=HORIZONTAL)
         sharpFactor.pack()
         sharpener = ImageEnhance.Sharpness(self.currentImage)
         self.currentImage = sharpener.enhance(sharpFactor.get())
+        return
+
+class Colour_Manipulation(Tool):
+    def action(self, currentImage):
+        return
+
+class Contrast_Brightness(Tool):
+    def action(self, currentImage):
+        return
+
+class Neon_Effect(Tool):
+    def action(self, currentImage):
         return
 
     
