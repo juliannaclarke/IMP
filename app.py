@@ -1,4 +1,4 @@
-from PIL import Image, ImageTk
+from PIL import Image, ImageTk, ImageFilter, ImageEnhance
 import tkinter as tk
 from tkinter import ttk
 from tkinter import filedialog
@@ -138,6 +138,29 @@ class MainApp(tk.Frame):
 
     def onExit(self):
         self.quit()
+
+class Tool:
+    def __init__(self, icon):
+        self.icon = icon
+    def action(self):
+        return
+
+class Find_Edges(Tool):
+    def action(self, currentImage):
+        self.currentImage = currentImage.filter(ImageFilter.FIND_EDGES)
+        return
+
+class Sharpness_Blur(Tool):
+    def action(self, currentImage):
+        blurRad = Scale(master, from_=0, to=5, orient=HORIZONTAL)
+        burRad.pack()
+        self.currentImage = currentImage.filter(ImageFilter.GaussianBlur(radius = blurRad.get()))
+
+        sharpFactor = Scale(master, from_=0, to=5, orient=HORIZONTAL)
+        sharpFactor.pack()
+        sharpener = ImageEnhance.Sharpness(self.currentImage)
+        self.currentImage = sharpener.enhance(sharpFactor.get())
+        return
 
     
 root = tk.Tk()
