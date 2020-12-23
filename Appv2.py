@@ -1,10 +1,14 @@
 from PIL import Image, ImageTk, ImageEnhance
 from PIL import ImageFilter
+import numpy as np
+import colorsys
 import tkinter as tk
 from tkinter import ttk
 from tkinter import filedialog
 import os
 import sys
+
+from inspect import currentframe
 
 #from https://stackoverflow.com/questions/6760685/creating-a-singleton-in-python
 class Singleton(type):
@@ -63,45 +67,68 @@ class Toolbar(tk.Frame):
         #create
         file_path = filedialog.askopenfilename()
         try:
-            cv.pilImg = Image.open(file_path)
-            self.dupeImg = cv.pilImg
+            loadedImg = Image.open(file_path)
+
+            self.currImg = loadedImg
+            cv.workingImg = self.currImg
+            cv.currImg = self.currImg
 
         except IOError:
             print("Unable to load image")
             sys.exit(1)
 
         #resize canvas to loaded image size
-        cv.x, cv.y = cv.pilImg.size 
+        cv.x, cv.y = cv.currImg.size 
         cv.canvas.config(width=cv.x, height=cv.y)
 
         #convert image into ImageTK.PhotoImage which can be loaded into canvas
-        self.dupeImg = ImageTk.PhotoImage(self.dupeImg)
-        imageSprite = cv.canvas.create_image(cv.x/2,cv.y/2,image = self.dupeImg)
+        self.currImg = ImageTk.PhotoImage(self.currImg)
+        imageSprite = cv.canvas.create_image(cv.x/2,cv.y/2,image = self.currImg)
 
     def onExit(self):
         self.quit()
 
 class Tool:
+    
+
     def __init__(self):
         self.popup = tk.Toplevel(root)
         self.popup.wm_title("")
-        self.cv = Canvas(0,0)
+
+        self.popup.protocol("WM_DELETE_WINDOW", self.onClosing)
+
+        
     def preview(self):
-        print("previewing manipulation")
-        return
+        pass
     def apply(self):
-        print("apply manipulation")
-        self.popup.destroy()
+        cv = Canvas(0,0)
+        self.preview()
+        cv.currImg = cv.workingImg
+        self.onClosing()
+
     def commonButtons(self):
         #create and pack buttons, which call commmands when completed
         previewButton = ttk.Button(self.popup, text = "Preview", command = self.preview)
         acceptButton = ttk.Button(self.popup, text = "Accept", command = self.apply)
-        cancelButton = ttk.Button(self.popup, text = "Cancel", command = self.popup.destroy)
+        cancelButton = ttk.Button(self.popup, text = "Cancel", command = self.onClosing)
         previewButton.pack(pady = 15)
         acceptButton.pack(side=tk.LEFT, padx=2, pady=2)
         cancelButton.pack(side=tk.LEFT, padx=2, pady=2)
 
         self.popup.mainloop()
+
+    def onClosing(self):
+        cv = Canvas(0,0)
+        cv.canvas.delete("all")
+        try:
+            self.currImg = cv.currImg            
+        except:
+            self.popup.destroy()
+
+        self.currImg = ImageTk.PhotoImage(self.currImg)
+        imageSprite = cv.canvas.create_image(cv.x/2,cv.y/2,image = self.currImg)
+        self.popup.destroy()
+    
 
 class Find_Edges(Tool):
     def __init__(self):
@@ -110,13 +137,13 @@ class Find_Edges(Tool):
         label.pack(side="top", pady = 10)
         self.commonButtons()
     def preview(self):
-        dupeImg = self.cv.pilImage
-        print ("Got Image")
-        dupeImg = dupeImg.filter(ImageFilter.FIND_EDGES)
-        imageSprite = self.cv.canvas.create_image(self.cv.x/2,self.cv.y/2,image = dupeImg)
-
-
-
+        cv = Canvas(0,0)
+        self.currImg = cv.currImg
+        self.currImg = self.currImg.convert(mode = "L")
+        self.currImg = self.currImg.filter(ImageFilter.FIND_EDGES)
+        cv.workingImg = self.currImg
+        self.currImg = ImageTk.PhotoImage(self.currImg)
+        imageSprite = cv.canvas.create_image(cv.x/2,cv.y/2,image = self.currImg)
 
 class Sharpen_Blur(Tool):
     def __init__(self):
@@ -137,6 +164,9 @@ class Colour_Manipulation(Tool):
         slider = tk.Scale(self.popup, from_=-100, to = 100, orient=tk.HORIZONTAL)
         slider.pack(pady=20)
         self.commonButtons()
+
+    #https://stackoverflow.com/questions/7274221/changing-image-hue-with-python-pil
+
 
 class Brightness_Contrast(Tool):
     def __init__(self):
@@ -163,7 +193,9 @@ class VFX(Tool):
 class Canvas(metaclass = Singleton):
     def __init__(self, x, y):
         #create a canvas and pack it
-        self.pilImage = Image
+        self.currImg = Image
+        self.workingImg = Image
+
         self.x = x
         self.y = y
         self.canvas = tk.Canvas(root, height=x, width=y, bg="#deadbf")
