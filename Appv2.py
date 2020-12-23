@@ -1,5 +1,5 @@
-from PIL import Image, ImageTk, ImageEnhance
-from PIL import ImageFilter
+from PIL import Image, ImageTk, ImageDraw
+from PIL import ImageFilter, ImageEnhance, ImageChops
 import numpy as np
 import colorsys
 import tkinter as tk
@@ -34,7 +34,7 @@ class Toolbar(tk.Frame):
         #create file menu
         menuBar = tk.Menu(self.master)
         self.fileMenu = tk.Menu(self.master, tearoff=0)
-        self.fileMenu.add_command(label="Save")
+        self.fileMenu.add_command(label="Save", command = self.onSave)
         self.fileMenu.add_command(label="Load", command = self.onLoad)
         self.fileMenu.add_command(label="Exit", command = self.onExit)
         menuBar.add_cascade(label="File", menu=self.fileMenu)
@@ -85,12 +85,20 @@ class Toolbar(tk.Frame):
         self.currImg = ImageTk.PhotoImage(self.currImg)
         imageSprite = cv.canvas.create_image(cv.x/2,cv.y/2,image = self.currImg)
 
+    def onSave(self):
+        cv = Canvas(0,0)
+        file_path = filedialog.asksaveasfilename(filetypes = (('PNG Image','.png'),))
+        try:
+            cv.currImg.save(file_path, format="PNG")
+
+        except IOError:
+            print("Unable to save image")
+            sys.exit(1)
+
     def onExit(self):
         self.quit()
 
 class Tool:
-    
-
     def __init__(self):
         self.popup = tk.Toplevel(root)
         self.popup.wm_title("")
@@ -127,9 +135,6 @@ class Tool:
             self.popup.destroy()        
         except:
             self.popup.destroy()
-
-        
-    
 
 class Find_Edges(Tool):
     def __init__(self):
@@ -215,12 +220,9 @@ class Colour_Manipulation(Tool):
 
         self.previewImg = cv.currImg
         self.previewImg = colorize(self.previewImg, self.slider.get())
+        cv.workingImg = self.previewImg
         self.previewImg = ImageTk.PhotoImage(self.previewImg)
         imageSprite = cv.canvas.create_image(cv.x/2,cv.y/2,image = self.previewImg)
-
-
-
-        
 
 
 class Brightness_Contrast(Tool):
@@ -228,14 +230,26 @@ class Brightness_Contrast(Tool):
         super().__init__()
         #create and pack text & slider for brightness
         brightLabel = ttk.Label(self.popup, text = "Brightness")
-        brightSlider = tk.Scale(self.popup, from_=-100, to=100, orient=tk.HORIZONTAL)
+        self.brightSlider = tk.Scale(self.popup, from_=-100, to=100, orient=tk.HORIZONTAL)
         brightLabel.pack(pady = 10)
-        brightSlider.pack(pady = 20)
+        self.brightSlider.pack(pady = 20)
         contrLabel = ttk.Label(self.popup, text="Contrast")
-        contSlider = tk.Scale(self.popup, from_=-100, to=100, orient=tk.HORIZONTAL)
+        self.contSlider = tk.Scale(self.popup, from_=-100, to=100, orient=tk.HORIZONTAL)
         contrLabel.pack(pady=10)
-        contSlider.pack(pady=20)
+        self.contSlider.pack(pady=20)
         self.commonButtons()
+
+    def preview(self):
+        cv = Canvas(0,0)
+        self.previewImg = cv.currImg
+        brightEnhancer = ImageEnhance.Brightness(self.previewImg)
+        contEnhancer = ImageEnhance.Brightness(brightEnhancer.enhance(  (self.brightSlider.get()+100)/100) )
+        self.previewImg = contEnhancer.enhance((self.contSlider.get() + 100)/100)
+        cv.workingImg = self.previewImg
+        self.previewImg = ImageTk.PhotoImage(self.previewImg)
+        imageSprite = cv.canvas.create_image(cv.x/2,cv.y/2,image = self.previewImg)
+
+
 
 class VFX(Tool):
     def __init__(self):
@@ -244,6 +258,36 @@ class VFX(Tool):
         label = ttk.Label(self.popup, text = "Special Effect")
         label.pack(side="top", pady = 10)
         self.commonButtons()
+
+    def preview(self):
+        cv = Canvas(0,0)
+
+        #generate gradient
+        #https://gist.github.com/weihanglo/1e754ec47fdd683a42fdf6a272904535
+        def interpolate(f_co, t_co, interval):
+            det_co =[(t - f) / interval for f , t in zip(f_co, t_co)]
+            for i in range(interval):
+                yield [round(f + det * i) for f, det in zip(f_co, det_co)]
+
+        gradient = Image.new('RGBA', cv.currImg.size, color=0)
+        draw = ImageDraw.Draw(gradient)
+
+        f_co = (255, 30, 30)
+        t_co = (30, 30, 255)
+        for i, color in enumerate(interpolate(f_co, t_co, cv.currImg.width * 2)):
+            draw.line([(i, 0), (0, i)], tuple(color), width=1)
+
+        #find edge
+        edgeView = cv.currImg
+        edgeView = edgeView.convert(mode = "L")
+        edgeView = edgeView.filter(ImageFilter.FIND_EDGES)
+        edgeView = edgeView.convert(mode="RGBA")
+
+        resultImg = ImageChops.multiply(edgeView, gradient)
+
+        cv.workingImg = resultImg
+        self.previewImg = ImageTk.PhotoImage(resultImg)
+        imageSprite = cv.canvas.create_image(cv.x/2,cv.y/2,image = self.previewImg)
 
 class Canvas(metaclass = Singleton):
     def __init__(self, x, y):
