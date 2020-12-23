@@ -121,13 +121,14 @@ class Tool:
         cv = Canvas(0,0)
         cv.canvas.delete("all")
         try:
-            self.currImg = cv.currImg            
+            self.previewImg = cv.currImg    
+            self.previewImg = ImageTk.PhotoImage(self.previewImg)
+            imageSprite = cv.canvas.create_image(cv.x/2,cv.y/2,image = self.previewImg)
+            self.popup.destroy()        
         except:
             self.popup.destroy()
 
-        self.currImg = ImageTk.PhotoImage(self.currImg)
-        imageSprite = cv.canvas.create_image(cv.x/2,cv.y/2,image = self.currImg)
-        self.popup.destroy()
+        
     
 
 class Find_Edges(Tool):
@@ -138,12 +139,12 @@ class Find_Edges(Tool):
         self.commonButtons()
     def preview(self):
         cv = Canvas(0,0)
-        self.currImg = cv.currImg
-        self.currImg = self.currImg.convert(mode = "L")
-        self.currImg = self.currImg.filter(ImageFilter.FIND_EDGES)
-        cv.workingImg = self.currImg
-        self.currImg = ImageTk.PhotoImage(self.currImg)
-        imageSprite = cv.canvas.create_image(cv.x/2,cv.y/2,image = self.currImg)
+        self.previewImg = cv.currImg
+        self.previewImg = self.previewImg.convert(mode = "L")
+        self.previewImg = self.previewImg.filter(ImageFilter.FIND_EDGES)
+        cv.workingImg = self.previewImg
+        self.previewImg = ImageTk.PhotoImage(self.previewImg)
+        imageSprite = cv.canvas.create_image(cv.x/2,cv.y/2,image = self.previewImg)
 
 class Sharpen_Blur(Tool):
     def __init__(self):
@@ -151,9 +152,30 @@ class Sharpen_Blur(Tool):
         #create and pack text & slider for sharpness/blur
         label = ttk.Label(self.popup, text = "Sharpen/Blur")
         label.pack(side="top", pady = 10)
-        slider = tk.Scale(self.popup, from_=-100, to = 100, orient=tk.HORIZONTAL)
-        slider.pack(pady=20)
+        self.slider = tk.Scale(self.popup, from_=-100, to = 100, orient=tk.HORIZONTAL)
+        self.slider.pack(pady=20)
         self.commonButtons()
+    def preview(self):
+        cv = Canvas(0,0)
+
+        if (self.slider.get() < 0):
+            self.previewImg = cv.currImg
+            self.previewImg = self.previewImg.filter(ImageFilter.GaussianBlur(self.slider.get() / 10))
+            cv.workingImg = self.previewImg
+            self.previewImg = ImageTk.PhotoImage(self.previewImg)
+            imageSprite = cv.canvas.create_image(cv.x/2,cv.y/2,image = self.previewImg)
+        elif (self.slider.get() > 0):
+            self.previewImg = cv.currImg
+            self.previewImg = self.previewImg.filter(ImageFilter.UnsharpMask(2, self.slider.get()* 2, 3))
+            cv.workingImg = self.previewImg
+            self.previewImg = ImageTk.PhotoImage(self.previewImg)
+            imageSprite = cv.canvas.create_image(cv.x/2,cv.y/2,image = self.previewImg)
+        else:
+            self.previewImg = cv.currImg
+            cv.workingImg = self.previewImg
+            self.previewImg = ImageTk.PhotoImage(self.previewImg)
+            imageSprite = cv.canvas.create_image(cv.x/2,cv.y/2,image = self.previewImg)
+
 
 class Colour_Manipulation(Tool):
     def __init__(self):
@@ -161,11 +183,44 @@ class Colour_Manipulation(Tool):
         #create and pack text
         label = ttk.Label(self.popup, text = "Hue")
         label.pack(side="top", pady = 10)
-        slider = tk.Scale(self.popup, from_=-100, to = 100, orient=tk.HORIZONTAL)
-        slider.pack(pady=20)
+        self.slider = tk.Scale(self.popup, from_=-180, to = 180, orient=tk.HORIZONTAL)
+        self.slider.pack(pady=20)
         self.commonButtons()
+        
 
     #https://stackoverflow.com/questions/7274221/changing-image-hue-with-python-pil
+    def preview(self):
+        cv = Canvas(0,0)
+        rgb_to_hsv = np.vectorize(colorsys.rgb_to_hsv)
+        hsv_to_rgb = np.vectorize(colorsys.hsv_to_rgb)
+
+        def shift_hue(arr, hout):
+            r, g, b, a = np.rollaxis(arr, axis=-1)
+            h, s, v = rgb_to_hsv(r, g, b)
+            h = hout
+            r, g, b = hsv_to_rgb(h, s, v)
+            arr = np.dstack((r, g, b, a))
+            return arr
+
+        def colorize(image, hue):
+            """
+            Colorize PIL image `original` with the given
+            `hue` (hue within 0-360); returns another PIL image.
+            """
+            img = image.convert('RGBA')
+            arr = np.array(np.asarray(img).astype('float'))
+            new_img = Image.fromarray(shift_hue(arr, hue/360.).astype('uint8'), 'RGBA')
+
+            return new_img
+
+        self.previewImg = cv.currImg
+        self.previewImg = colorize(self.previewImg, self.slider.get())
+        self.previewImg = ImageTk.PhotoImage(self.previewImg)
+        imageSprite = cv.canvas.create_image(cv.x/2,cv.y/2,image = self.previewImg)
+
+
+
+        
 
 
 class Brightness_Contrast(Tool):
